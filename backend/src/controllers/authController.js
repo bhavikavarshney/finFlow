@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
 
 function createToken(user) {
-  return jwt.sign({ sub: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+  return jwt.sign({ sub: user.id, version: user.tokenVersion || 0 }, process.env.JWT_SECRET, { expiresIn: '1d' })
 }
 
 function userResponse(user) {
@@ -80,9 +80,11 @@ export async function login(request, response, next) {
     const password = typeof request.body.password === 'string' ? request.body.password : ''
     const user = await User.findOne({ email }).select('+passwordHash')
 
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    if (!user || !(await bcrypt.compare(password, user.passwordHash)) || user.status === 'suspended') {
       return response.status(401).json({ message: 'Email or password is incorrect.' })
     }
+    user.lastActiveAt = new Date()
+    await user.save()
     return response.json({ token: createToken(user), user: userResponse(user) })
   } catch (error) {
     return next(error)
@@ -91,4 +93,21 @@ export async function login(request, response, next) {
 
 export function currentUser(request, response) {
   response.json({ user: userResponse(request.user) })
+}
+
+export async function changePassword(request, response, next) {
+  try {
+    const { currentPassword, newPassword } = request.body
+    const user = await User.findById(request.user.id).select('+passwordHash')
+    if (!user || typeof currentPassword !== 'string' || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+      return response.status(400).json({ message: 'Current password is incorrect.' })
+    }
+    if (typeof newPassword !== 'string' || newPassword.length < 8 || newPassword.length > 72) {
+      return response.status(400).json({ message: 'New password must be between 8 and 72 characters.' })
+    }
+    user.passwordHash = await bcrypt.hash(newPassword, 12)
+    user.tokenVersion = (user.tokenVersion || 0) + 1
+    await user.save()
+    response.json({ token: createToken(user), message: 'Password changed. Other sessions have been signed out.' })
+  } catch (error) { next(error) }
 }

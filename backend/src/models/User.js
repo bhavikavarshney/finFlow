@@ -7,6 +7,9 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   currency: { type: String, enum: ['INR', 'USD', 'EUR', 'GBP'], default: 'INR' },
   avatarDataUrl: { type: String, maxlength: 350000, default: '' },
+  status: { type: String, enum: ['active', 'suspended'], default: 'active' },
+  lastActiveAt: { type: Date, default: null },
+  tokenVersion: { type: Number, default: 0 },
 }, { timestamps: true })
 
 export default mongoose.model('User', userSchema)

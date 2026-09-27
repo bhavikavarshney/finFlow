@@ -40,13 +40,19 @@ export function AuthProvider({ children }) {
     return data.user
   }
 
+  async function changePassword(passwords) {
+    const { data } = await api.patch('/auth/password', passwords)
+    localStorage.setItem('token', data.token)
+    return data.message
+  }
+
   function logout() {
     localStorage.removeItem('token')
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, updateProfile, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, updateProfile, changePassword, logout }}>
       {children}
     </AuthContext.Provider>
   )
