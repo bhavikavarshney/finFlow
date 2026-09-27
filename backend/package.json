@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",
-    "check": "node --check server.js && node --check src/controllers/authController.js && node --check src/middleware/auth.js && node --check src/models/User.js && node --check src/routes/authRoutes.js"
+    "check": "node --check server.js && node --check src/controllers/authController.js && node --check src/controllers/adminController.js && node --check src/controllers/financeController.js && node --check src/middleware/auth.js && node --check src/middleware/usageTracker.js && node --check src/models/User.js && node --check src/models/AdminData.js && node --check src/models/Finance.js && node --check src/routes/authRoutes.js && node --check src/routes/adminRoutes.js && node --check src/routes/financeRoutes.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
