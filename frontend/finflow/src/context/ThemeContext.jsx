@@ -16,12 +16,8 @@ export function ThemeProvider({ children }) {
   }, [theme])
 
   function toggleTheme() {
-    setTheme((currentTheme) => currentTheme === 'light' ? 'dark' : 'light')
+    setTheme((currentTheme) => (currentTheme === 'light' ? 'dark' : 'light'))
   }
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
 }

@@ -43,13 +43,15 @@ The Vite client uses `http://localhost:5000/api` by default. Set `VITE_API_URL` 
 4. Keep the same URI in `backend/.env`; for example, `mongodb://127.0.0.1:27017/finflow` selects the `finflow` database.
 5. Start the API and sign up through the app. A `users` document will be created with `name`, `email`, `passwordHash`, `role`, `currency`, and timestamp fields. Passwords are stored as bcrypt hashes, not plain text.
 
-Mongoose can create the database and `users` collection automatically on the first signup, so creating them in Compass first is optional. Personal finance records use owner-scoped `accounts`, `transactions`, `budgets`, and `goals` collections for both standard users and administrators. Admin telemetry/configuration uses `usageevents`, `auditlogs`, `systemevents`, and `appsettings`; Mongoose creates these collections on first use. You do not need to create collections manually in Compass.
+Mongoose can create the database and `users` collection automatically on the first signup, so creating them in Compass first is optional. Personal finance records use owner-scoped `accounts`, `transactions`, `budgets`, and `goals` collections for both standard users and administrators. Account `type` is `debit` or `credit`; `category` describes its purpose, such as `bank_account`, `savings`, or `salary`. Existing account records with older mixed type values are normalized when returned by the API. Admin telemetry/configuration uses `usageevents`, `auditlogs`, `systemevents`, and `appsettings`; Mongoose creates these collections on first use. You do not need to create collections manually in Compass.
 
 ## Auth, Roles, And Currency
 
 Signup and login return a one-day JWT. The client stores it in `localStorage`, sends it as a bearer token, and validates the session with `/api/auth/me` on startup. Signing out removes the token; expired or invalid tokens are rejected by the API. New accounts always receive the `user` role. For local development, update a user's `role` field to `admin` in the Compass `finflow.users` collection. The `/admin` client route and `/api/admin/overview` endpoint both require that role.
 
 User currency is stored on the user document and defaults to `INR`. Profile settings allow users to change their display currency, and dashboard amounts use a shared formatter. Supported currency codes in the current user schema are `INR`, `USD`, `EUR`, and `GBP`; changing the display currency does not convert stored financial values.
+
+Transactions use `credit` and `debit` types. For bank/debit accounts, credit increases available funds and debit decreases them. For credit accounts, credit increases outstanding debt and debit reduces it (including card bill payments). Legacy `income`, `expense`, and `payment` transactions are mapped to credit/debit when returned by the API.
 
 ## Admin Access
 

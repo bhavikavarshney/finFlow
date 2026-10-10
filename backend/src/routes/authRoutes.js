@@ -1,5 +1,11 @@
 import { Router } from 'express'
-import { changePassword, currentUser, login, signup, updateProfile } from '../controllers/authController.js'
+import {
+  changePassword,
+  currentUser,
+  login,
+  signup,
+  updateProfile,
+} from '../controllers/authController.js'
 import { requireAuth, requireRegistrationEnabled } from '../middleware/auth.js'
 
 const router = Router()

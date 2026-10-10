@@ -22,11 +22,21 @@ export default function useFinanceData() {
 
   useEffect(() => {
     let current = true
-    api.get('/finance/summary')
-      .then(({ data: summary }) => { if (current) setData(summary) })
-      .catch((requestError) => { if (current) setError(requestError.response?.data?.message || 'Could not load your finance data.') })
-      .finally(() => { if (current) setLoading(false) })
-    return () => { current = false }
+    api
+      .get('/finance/summary')
+      .then(({ data: summary }) => {
+        if (current) setData(summary)
+      })
+      .catch((requestError) => {
+        if (current)
+          setError(requestError.response?.data?.message || 'Could not load your finance data.')
+      })
+      .finally(() => {
+        if (current) setLoading(false)
+      })
+    return () => {
+      current = false
+    }
   }, [])
 
   async function create(resource, values) {
@@ -39,5 +49,15 @@ export default function useFinanceData() {
     }
   }
 
-  return { data, error, loading, refresh, create }
+  async function updateAccount(accountId, updates) {
+    try {
+      await api.patch(`/finance/accounts/${accountId}`, updates)
+      await refresh()
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Could not update this account.')
+      throw requestError
+    }
+  }
+
+  return { data, error, loading, refresh, create, updateAccount }
 }
