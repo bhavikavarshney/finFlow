@@ -10,14 +10,26 @@ export function AuthProvider({ children }) {
     let active = true
     const token = localStorage.getItem('token')
 
-    if (!token) return () => { active = false }
+    if (!token)
+      return () => {
+        active = false
+      }
 
-    api.get('/auth/me')
-      .then(({ data }) => { if (active) setUser(data.user) })
-      .catch(() => { localStorage.removeItem('token') })
-      .finally(() => { if (active) setLoading(false) })
+    api
+      .get('/auth/me')
+      .then(({ data }) => {
+        if (active) setUser(data.user)
+      })
+      .catch(() => {
+        localStorage.removeItem('token')
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
 
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [])
 
   async function authenticate(endpoint, credentials) {
@@ -52,7 +64,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, updateProfile, changePassword, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, signup, updateProfile, changePassword, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )

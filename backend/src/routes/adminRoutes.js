@@ -1,5 +1,16 @@
 import { Router } from 'express'
-import { analytics, auditLogs, exportReport, getSettings, health, listUsers, notifications, overview, updateSettings, updateUserStatus } from '../controllers/adminController.js'
+import {
+  analytics,
+  auditLogs,
+  exportReport,
+  getSettings,
+  health,
+  listUsers,
+  notifications,
+  overview,
+  updateSettings,
+  updateUserStatus,
+} from '../controllers/adminController.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 
 const router = Router()
